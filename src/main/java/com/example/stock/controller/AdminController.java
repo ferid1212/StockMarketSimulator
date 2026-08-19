@@ -81,4 +81,12 @@ public class AdminController {
         } catch (Exception ignored) {}
         return "redirect:/admin?productDeleted=true";
     }
+
+    @PostMapping("/products/update/{id}")
+    public String updateProduct(@PathVariable("id") Long id, @ModelAttribute("productRequest") ProductRequest productRequest) {
+        try {
+            productService.update(id, productRequest);
+        } catch (Exception ignored) {}
+        return "redirect:/admin?productUpdated=true";
+    }
 }

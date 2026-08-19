@@ -1,290 +1,668 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Paneli | Stock System</title>
+    <title>Admin Paneli — Stock System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #090d16);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #090d16;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.18) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.65);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
         }
+
+        .glass-panel-glow {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.25);
+        }
+
         .glass-nav {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .neon-border {
+            position: relative;
+        }
+        .neon-border::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+        .neon-border:hover::after {
+            opacity: 0.9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.4);
+            border-radius: 9999px;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .glow-pulse {
+            animation: pulseGlow 4s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col">
+<body class="min-h-screen flex flex-col custom-scrollbar">
 
     <!-- Top Navigation Bar -->
-    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 flex items-center justify-between shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-md">
-                <i class="fa-solid fa-user-shield text-xl"></i>
+    <nav class="glass-nav sticky top-0 z-40 px-6 lg:px-12 py-3.5 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 p-0.5 shadow-lg shadow-purple-500/25 flex items-center justify-center">
+                <div class="w-full h-full bg-slate-950/80 rounded-[14px] flex items-center justify-center text-purple-300">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
             </div>
             <div>
-                <span class="text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">ADMIN PANERİ</span>
-                <span class="text-xs text-slate-400 block font-mono">Stock Control & Security Dashboard</span>
+                <div class="flex items-center gap-2">
+                    <span class="font-display font-black text-xl tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">STOCK CONTROL</span>
+                    <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-full text-[10px] font-extrabold uppercase tracking-wider">ADMIN PRO</span>
+                </div>
+                <span class="text-xs text-slate-400 font-medium">İdarəetmə və Nəzarət Mərkəzi</span>
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <a th:href="@{/dashboard}" class="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl border border-slate-700 transition">
-                <i class="fa-solid fa-house mr-1.5"></i> Əsas Səhifə
+        <div class="flex items-center gap-3">
+            <a th:href="@{/dashboard}" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/90 text-slate-200 text-sm font-semibold border border-slate-700/80 transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:shadow-indigo-500/10">
+                <i class="fa-solid fa-store text-indigo-400"></i>
+                <span>Mağazaya Keç</span>
             </a>
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" class="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-300 text-sm font-medium rounded-xl border border-red-500/30 transition">
-                    Çıxış <i class="fa-solid fa-arrow-right-from-bracket ml-1.5"></i>
+            
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-sm font-semibold border border-rose-500/30 transition-all duration-200 flex items-center gap-2">
+                    <span>Çıxış</span>
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
             </form>
         </div>
     </nav>
 
-    <!-- Main Admin Dashboard Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-8">
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         
-        <!-- Alerts -->
-        <div th:if="${param.userDeleted}" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-lg"></i>
-            <span>İstifadəçi uğurla silindi.</span>
-        </div>
-        <div th:if="${param.userCreated}" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-lg"></i>
-            <span>Yeni istifadəçi yaratıldı.</span>
-        </div>
-        <div th:if="${param.productCreated}" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-lg"></i>
-            <span>Məhsul uğurla əlavə edildi.</span>
-        </div>
-        <div th:if="${param.productDeleted}" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-lg"></i>
-            <span>Məhsul silindi.</span>
+        <!-- Alerts Banner Section -->
+        <div th:if="${param.productUpdated}" class="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-3 shadow-lg shadow-emerald-500/10 animate-fade-in">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-base">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <strong class="font-bold">Məhsul Yeniləndi!</strong>
+                <p class="text-xs text-emerald-300/80">Məhsul məlumatları uğurla redaktə edildi və bazada saxlanıldı.</p>
+            </div>
         </div>
 
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+        <div th:if="${param.productCreated}" class="p-4 rounded-2xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 text-sm flex items-center gap-3 shadow-lg shadow-indigo-500/10 animate-fade-in">
+            <div class="w-8 h-8 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-base">
+                <i class="fa-solid fa-circle-plus"></i>
+            </div>
+            <div>
+                <strong class="font-bold">Yeni Məhsul Əlavə Olundu!</strong>
+                <p class="text-xs text-indigo-300/80">Məhsul anbar siyahısına uğurla daxil edildi.</p>
+            </div>
+        </div>
+
+        <div th:if="${param.productDeleted}" class="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-sm flex items-center gap-3 shadow-lg shadow-amber-500/10 animate-fade-in">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 text-base">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+                <strong class="font-bold">Məhsul Silindi!</strong>
+                <p class="text-xs text-amber-300/80">Məhsul anbar qeydiyyatından çıxarıldı.</p>
+            </div>
+        </div>
+
+        <div th:if="${param.userCreated}" class="p-4 rounded-2xl bg-purple-500/15 border border-purple-500/40 text-purple-300 text-sm flex items-center gap-3 shadow-lg shadow-purple-500/10 animate-fade-in">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 text-base">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <div>
+                <strong class="font-bold">İstifadəçi Qeydə Alındı!</strong>
+                <p class="text-xs text-purple-300/80">Yeni istifadəçi hesabı uğurla yaradıldı.</p>
+            </div>
+        </div>
+
+        <div th:if="${param.userDeleted}" class="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-sm flex items-center gap-3 shadow-lg shadow-rose-500/10 animate-fade-in">
+            <div class="w-8 h-8 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400 text-base">
+                <i class="fa-solid fa-user-xmark"></i>
+            </div>
+            <div>
+                <strong class="font-bold">İstifadəçi Silindi!</strong>
+                <p class="text-xs text-rose-300/80">İstifadəçi hesabı sistemdən təmizləndi.</p>
+            </div>
+        </div>
+
+        <!-- Metrics Dashboard Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Card 1: Users -->
+            <div class="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:border-indigo-500/50 transition-all duration-300">
+                <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-indigo-500/15 rounded-full blur-2xl group-hover:bg-indigo-500/25 transition"></div>
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Ümumi İstifadəçilər</span>
-                        <p class="text-3xl font-extrabold text-white mt-1" th:text="${userCount}">0</p>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Ümumi İstifadəçi</span>
+                        <h3 class="font-display text-3xl font-extrabold text-white mt-1.5" th:text="${userCount}">0</h3>
+                        <p class="text-[11px] text-indigo-400 mt-1 font-medium"><i class="fa-solid fa-chart-line mr-1"></i> Qeydiyyatda olanlar</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
+                    <div class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <!-- Card 2: Products -->
+            <div class="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:border-purple-500/50 transition-all duration-300">
+                <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-purple-500/15 rounded-full blur-2xl group-hover:bg-purple-500/25 transition"></div>
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Ümumi Məhsullar</span>
-                        <p class="text-3xl font-extrabold text-white mt-1" th:text="${productCount}">0</p>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Stok Məhsulları</span>
+                        <h3 class="font-display text-3xl font-extrabold text-white mt-1.5" th:text="${productCount}">0</h3>
+                        <p class="text-[11px] text-purple-400 mt-1 font-medium"><i class="fa-solid fa-boxes-stacked mr-1"></i> Aktiv çeşidlər</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+                    <div class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-box-open"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <!-- Card 3: Categories -->
+            <div class="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:border-pink-500/50 transition-all duration-300">
+                <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-pink-500/15 rounded-full blur-2xl group-hover:bg-pink-500/25 transition"></div>
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Admin Statusu</span>
-                        <p class="text-lg font-bold text-emerald-400 mt-1">Aktiv (Aktual)</p>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Kateqoriyalar</span>
+                        <h3 class="font-display text-3xl font-extrabold text-white mt-1.5" th:text="${#arrays.length(categories)}">11</h3>
+                        <p class="text-[11px] text-pink-400 mt-1 font-medium"><i class="fa-solid fa-layer-group mr-1"></i> Fərqli bölmələr</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-shield-check"></i>
+                    <div class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-tr from-pink-600 to-rose-500 text-white shadow-lg shadow-pink-500/30 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-tags"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <!-- Card 4: Status -->
+            <div class="glass-panel rounded-3xl p-5 relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-300">
+                <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-500/15 rounded-full blur-2xl group-hover:bg-emerald-500/25 transition"></div>
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Admin Gmail</span>
-                        <p class="text-sm font-mono text-indigo-300 mt-1 truncate">admin@gmail.com</p>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">Sistem Statusu</span>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="font-bold text-emerald-400 text-lg">Onlayn</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1 font-mono">admin@gmail.com</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-key"></i>
+                    <div class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-bolt"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Users Management Section -->
-        <div class="glass-card rounded-2xl p-6 shadow-xl space-y-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <!-- ================= PRODUCT MANAGEMENT SECTION ================= -->
+        <section class="glass-panel rounded-3xl p-6 lg:p-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
                 <div>
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-users-gear text-indigo-400"></i> İstifadəçilərin İdarə Edilməsi
+                    <h2 class="font-display text-2xl font-black text-white flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-boxes-packing"></i>
+                        </span>
+                        Məhsulların İdarə Edilməsi
                     </h2>
-                    <p class="text-slate-400 text-xs mt-0.5">Sistemdə qeydiyyatdan keçmiş bütün istifadəçilər</p>
+                    <p class="text-slate-400 text-xs mt-1">Anbardakı məhsulları əlavə edin, redaktə edin və ya silin</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold">
+                        <i class="fa-solid fa-cubes mr-1.5"></i> <span th:text="${productCount}">0</span> Məhsul mövcuddur
+                    </span>
                 </div>
             </div>
 
-            <!-- Users Table -->
-            <div class="overflow-x-auto rounded-xl border border-slate-800">
-                <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-800">
-                        <tr>
-                            <th class="px-4 py-3">ID</th>
-                            <th class="px-4 py-3">Ad / Soyad</th>
-                            <th class="px-4 py-3">Email (Gmail)</th>
-                            <th class="px-4 py-3">Telefon</th>
-                            <th class="px-4 py-3">Rol</th>
-                            <th class="px-4 py-3">Balans</th>
-                            <th class="px-4 py-3 text-right">Əməliyyatlar</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-800/60">
-                        <tr th:each="user : ${users}" class="hover:bg-slate-800/40 transition">
-                            <td class="px-4 py-3 font-mono text-xs text-slate-500" th:text="${user.id}">1</td>
-                            <td class="px-4 py-3 font-medium text-white" th:text="${user.name + ' ' + user.surname}">Admin System</td>
-                            <td class="px-4 py-3 font-mono text-indigo-300" th:text="${user.email}">admin@gmail.com</td>
-                            <td class="px-4 py-3 text-slate-400" th:text="${user.phone}">+994500000000</td>
-                            <td class="px-4 py-3">
-                                <span th:if="${user.role == 'ROLE_ADMIN'}" class="px-2.5 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-xs font-bold">
-                                    <i class="fa-solid fa-crown mr-1"></i> ADMIN
-                                </span>
-                                <span th:if="${user.role != 'ROLE_ADMIN'}" class="px-2.5 py-1 bg-slate-700/60 text-slate-300 rounded-full text-xs font-medium">
-                                    USER
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 font-semibold text-emerald-400" th:text="${user.balance != null ? user.balance + ' ₼' : '0 ₼'}">0 ₼</td>
-                            <td class="px-4 py-3 text-right">
-                                <form th:action="@{'/admin/users/delete/' + ${user.id}}" method="post" class="inline"
-                                      onsubmit="return confirm('Bu istifadəçini silməkdən əminsiniz?');">
-                                    <button type="submit" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs transition">
-                                        <i class="fa-solid fa-trash-can mr-1"></i> Sil
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(users)}">
-                            <td colspan="7" class="text-center py-6 text-slate-500">Heç bir istifadəçi tapılmadı.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Product Management Section -->
-        <div class="glass-card rounded-2xl p-6 shadow-xl space-y-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-                <div>
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-boxes-packing text-purple-400"></i> Məhsulların İdarə Edilməsi
-                    </h2>
-                    <p class="text-slate-400 text-xs mt-0.5">Sistemdə olan Stok məhsulları</p>
-                </div>
-            </div>
-
-            <!-- Search & Filter Form for Admin -->
-            <form th:action="@{/admin}" method="get" class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row items-center gap-3">
+            <!-- Filter & Search Bar -->
+            <form th:action="@{/admin}" method="get" class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center gap-3">
                 <div class="relative flex-1 w-full">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
-                    <input type="text" name="search" th:value="${searchQuery}" placeholder="Məhsul adı ilə axtar..." 
-                           class="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                    <input type="text" name="search" th:value="${searchQuery}" placeholder="Məhsul adı ilə axtarış..." 
+                           class="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                 </div>
 
-                <div class="w-full md:w-52">
-                    <select name="category" class="w-full px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                <div class="w-full md:w-60">
+                    <select name="category" class="w-full px-3.5 py-2.5 bg-slate-950/70 border border-slate-700/60 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition">
                         <option value="">Bütün Kateqoriyalar</option>
                         <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${cat.name() == selectedCategory}">ELECTRONICS</option>
                     </select>
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button type="submit" class="flex-1 md:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-lg transition">
-                        <i class="fa-solid fa-filter mr-1"></i> Axtar
+                    <button type="submit" class="flex-1 md:flex-none px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Axtar</span>
                     </button>
                     <a th:href="@{/admin}" th:if="${(searchQuery != null && !#strings.isEmpty(searchQuery)) || (selectedCategory != null && !#strings.isEmpty(selectedCategory))}"
-                       class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition">
-                        Sıfırla
+                       class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Sıfırla
                     </a>
                 </div>
             </form>
 
-            <!-- Create Product Form -->
-            <form th:action="@{/admin/products/create}" th:object="${newProductRequest}" method="post" class="bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
-                <h3 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider">Yeni Məhsul Əlavə Et</h3>
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                    <input type="text" name="name" required placeholder="Məhsul Adı"
-                           class="px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                    
-                    <select name="category" required class="px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
-                        <option value="" disabled selected>Kateqoriya Seç</option>
-                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">ELECTRONICS</option>
-                    </select>
-
-                    <input type="number" step="0.01" name="price" required placeholder="Qiymət (₼)"
-                           class="px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                    
-                    <input type="number" name="stock" required placeholder="Stok Sayı"
-                           class="px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-
-                    <input type="text" name="imgURL" placeholder="Şəkil URL (İstəyə bağlı)"
-                           class="px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            <!-- Add New Product Form (Vibrant Form) -->
+            <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-purple-950/30 border border-purple-500/20 shadow-xl">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
+                    <h3 class="font-display text-sm font-extrabold uppercase tracking-wider text-pink-300">Yeni Məhsul Əlavə Et</h3>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-sm transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Məhsulu Əlavə Et
-                    </button>
-                </div>
-            </form>
+
+                <form th:action="@{/admin/products/create}" th:object="${newProductRequest}" method="post" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">Məhsul Adı *</label>
+                            <input type="text" name="name" required placeholder="Məs: Qatıq, Ət, Şirə..."
+                                   class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">Kateqoriya *</label>
+                            <select name="category" required class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition">
+                                <option value="" disabled selected>Kateqoriya seçin</option>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">DAIRY_PRODUCTS</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">Qiymət (₼) *</label>
+                            <input type="number" step="0.01" min="0" name="price" required placeholder="0.00"
+                                   class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">Stok Sayı *</label>
+                            <input type="number" min="0" name="stock" required placeholder="10"
+                                   class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase text-slate-400 mb-1.5">Şəkil Linki (URL)</label>
+                            <input type="text" name="imgURL" placeholder="https://..."
+                                   class="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-purple-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Məhsulu Əlavə Et</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
             <!-- Products Table -->
-            <div class="overflow-x-auto rounded-xl border border-slate-800">
+            <div class="overflow-x-auto rounded-2xl border border-slate-800/90 shadow-2xl">
                 <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-800">
+                    <thead class="bg-slate-950/90 text-xs uppercase font-extrabold text-slate-400 border-b border-slate-800 tracking-wider">
                         <tr>
-                            <th class="px-4 py-3">ID</th>
-                            <th class="px-4 py-3">Məhsul Adı</th>
-                            <th class="px-4 py-3">Kateqoriya</th>
-                            <th class="px-4 py-3">Qiymət</th>
-                            <th class="px-4 py-3">Stok</th>
-                            <th class="px-4 py-3 text-right">Əməliyyat</th>
+                            <th class="px-5 py-4">Şəkil & Məhsul</th>
+                            <th class="px-4 py-4">Kateqoriya</th>
+                            <th class="px-4 py-4">Qiymət</th>
+                            <th class="px-4 py-4">Stok Vəziyyəti</th>
+                            <th class="px-5 py-4 text-right">Əməliyyatlar</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800/60">
-                        <tr th:each="product : ${products}" class="hover:bg-slate-800/40 transition">
-                            <td class="px-4 py-3 font-mono text-xs text-slate-500" th:text="${product.id}">1</td>
-                            <td class="px-4 py-3 font-medium text-white" th:text="${product.name}">Laptop</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2.5 py-1 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs" th:text="${product.category}">ELECTRONICS</span>
+                    <tbody class="divide-y divide-slate-800/60 bg-slate-900/40">
+                        <tr th:each="product : ${products}" class="hover:bg-slate-800/60 transition group">
+                            <!-- Product Name & Image -->
+                            <td class="px-5 py-3.5">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-950 border border-slate-700/60 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-md">
+                                        <img th:if="${product.imgURL != null && !#strings.isEmpty(product.imgURL)}" 
+                                             th:src="${product.imgURL}" alt="Product" 
+                                             class="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80';">
+                                        <div th:if="${product.imgURL == null || #strings.isEmpty(product.imgURL)}" class="text-purple-400">
+                                            <i class="fa-solid fa-box text-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white group-hover:text-purple-300 transition" th:text="${product.name}">Məhsul Adı</h4>
+                                        <span class="text-[11px] font-mono text-slate-500" th:text="'ID: #' + ${product.id}">ID: #1</span>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-3 font-semibold text-emerald-400" th:text="${product.price + ' ₼'}">1200 ₼</td>
-                            <td class="px-4 py-3 text-slate-300" th:text="${product.stock}">15</td>
-                            <td class="px-4 py-3 text-right">
+
+                            <!-- Category Badge -->
+                            <td class="px-4 py-3.5">
+                                <span class="px-3 py-1 bg-gradient-to-r from-purple-500/15 to-indigo-500/15 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-bold uppercase tracking-wider" th:text="${product.category}">
+                                    DAIRY_PRODUCTS
+                                </span>
+                            </td>
+
+                            <!-- Price -->
+                            <td class="px-4 py-3.5">
+                                <span class="font-display font-extrabold text-emerald-400 text-base" th:text="${#numbers.formatDecimal(product.price, 1, 2) + ' ₼'}">
+                                    0.00 ₼
+                                </span>
+                            </td>
+
+                            <!-- Stock Indicator -->
+                            <td class="px-4 py-3.5">
+                                <div th:if="${product.stock > 5}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                    <span th:text="${product.stock} + ' ədəd (Stokda)'">10 ədəd</span>
+                                </div>
+                                <div th:if="${product.stock > 0 && product.stock <= 5}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                    <span th:text="${product.stock} + ' ədəd (Az qalıb)'">3 ədəd</span>
+                                </div>
+                                <div th:if="${product.stock <= 0}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-xs font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                                    <span>Bitib</span>
+                                </div>
+                            </td>
+
+                            <!-- Actions: Edit & Delete -->
+                            <td class="px-5 py-3.5 text-right space-x-2 whitespace-nowrap">
+                                <!-- REDAKTE ET (EDIT) BUTTON -->
+                                <button type="button" 
+                                        th:onclick="openEditModal([[${product.id}]], [[${product.name}]], [[${product.category}]], [[${product.price}]], [[${product.stock}]], [[${product.imgURL}]])"
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-bold transition duration-150 shadow-sm hover:shadow-indigo-500/20">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    <span>Redaktə Et</span>
+                                </button>
+
+                                <!-- SIL (DELETE) FORM -->
                                 <form th:action="@{'/admin/products/delete/' + ${product.id}}" method="post" class="inline"
                                       onsubmit="return confirm('Bu məhsulu silməkdən əminsiniz?');">
-                                    <button type="submit" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs transition">
-                                        <i class="fa-solid fa-trash-can mr-1"></i> Sil
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-xs font-bold transition duration-150">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                        <span>Sil</span>
                                     </button>
                                 </form>
                             </td>
                         </tr>
+
                         <tr th:if="${#lists.isEmpty(products)}">
-                            <td colspan="6" class="text-center py-6 text-slate-500">Axtarışa uyğun məhsul tapılmadı.</td>
+                            <td colspan="5" class="text-center py-12 text-slate-500">
+                                <i class="fa-solid fa-box-open text-4xl mb-3 text-slate-600 block"></i>
+                                <p class="text-base font-semibold">Heç bir məhsul tapılmadı.</p>
+                                <p class="text-xs text-slate-500 mt-1">Yuxarıdakı formadan yeni məhsul əlavə edə bilərsiniz.</p>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
+
+        <!-- ================= USERS MANAGEMENT SECTION ================= -->
+        <section class="glass-panel rounded-3xl p-6 lg:p-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
+                <div>
+                    <h2 class="font-display text-2xl font-black text-white flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </span>
+                        İstifadəçilərin İdarə Edilməsi
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Sistemdə qeydiyyatdan keçmiş bütün istifadəçilərin siyahısı</p>
+                </div>
+
+                <span class="px-3.5 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold">
+                    <i class="fa-solid fa-user-check mr-1.5"></i> <span th:text="${userCount}">0</span> İstifadəçi
+                </span>
+            </div>
+
+            <!-- Users Table -->
+            <div class="overflow-x-auto rounded-2xl border border-slate-800/90 shadow-2xl">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-950/90 text-xs uppercase font-extrabold text-slate-400 border-b border-slate-800 tracking-wider">
+                        <tr>
+                            <th class="px-5 py-4">İstifadəçi</th>
+                            <th class="px-4 py-4">Email (Gmail)</th>
+                            <th class="px-4 py-4">Telefon</th>
+                            <th class="px-4 py-4">Rol</th>
+                            <th class="px-4 py-4">Balans</th>
+                            <th class="px-5 py-4 text-right">Əməliyyat</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 bg-slate-900/40">
+                        <tr th:each="u : ${users}" class="hover:bg-slate-800/60 transition">
+                            <td class="px-5 py-3.5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
+                                        <span th:text="${u.name != null ? u.name.substring(0,1) : 'U'}">U</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white" th:text="${u.name + ' ' + u.surname}">Ad Soyad</p>
+                                        <span class="text-[11px] font-mono text-slate-500" th:text="'ID: #' + ${u.id}">ID: #1</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3.5 font-mono text-indigo-300 text-xs" th:text="${u.email}">user@gmail.com</td>
+                            <td class="px-4 py-3.5 text-slate-400 text-xs" th:text="${u.phone}">+994500000000</td>
+                            
+                            <td class="px-4 py-3.5">
+                                <span th:if="${u.role == 'ROLE_ADMIN'}" class="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-xs font-black">
+                                    <i class="fa-solid fa-crown text-amber-400 mr-1"></i> ADMIN
+                                </span>
+                                <span th:if="${u.role != 'ROLE_ADMIN'}" class="inline-flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-xs font-semibold">
+                                    USER
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3.5 font-display font-extrabold text-emerald-400 text-sm" th:text="${u.balance != null ? #numbers.formatDecimal(u.balance, 1, 2) + ' ₼' : '0.00 ₼'}">
+                                0.00 ₼
+                            </td>
+
+                            <td class="px-5 py-3.5 text-right">
+                                <form th:if="${u.role != 'ROLE_ADMIN'}" th:action="@{'/admin/users/delete/' + ${u.id}}" method="post" class="inline"
+                                      onsubmit="return confirm('Bu istifadəçini və ona aid bütün səbəti silməkdən əminsiniz?');">
+                                    <button type="submit" class="px-3.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 hover:text-white border border-rose-500/30 rounded-xl text-xs font-bold transition">
+                                        <i class="fa-solid fa-trash-can mr-1"></i> Sil
+                                    </button>
+                                </form>
+                                <span th:if="${u.role == 'ROLE_ADMIN'}" class="text-[11px] text-slate-500 italic font-medium">Əsas İnzibatçı</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
     </main>
+
+    <!-- ================= EDIT PRODUCT MODAL ================= -->
+    <div id="editProductModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel-glow rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative animate-scale-up">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white">Məhsulu Redaktə Et</h3>
+                        <p class="text-xs text-slate-400" id="editModalSubtitle">Məhsul məlumatlarını yeniləyin</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditModal()" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <form id="editProductForm" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Məhsul Adı *</label>
+                    <input type="text" id="edit_name" name="name" required
+                           class="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Kateqoriya *</label>
+                        <select id="edit_category" name="category" required 
+                                class="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">DAIRY_PRODUCTS</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Qiymət (₼) *</label>
+                        <input type="number" step="0.01" min="0" id="edit_price" name="price" required
+                               class="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Stok Sayı *</label>
+                        <input type="number" min="0" id="edit_stock" name="stock" required
+                               class="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Şəkil Linki (URL)</label>
+                        <input type="text" id="edit_imgURL" name="imgURL" placeholder="https://..." oninput="updateImagePreview(this.value)"
+                               class="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+                </div>
+
+                <!-- Live Image Preview inside modal -->
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-lg bg-slate-900 border border-slate-700 overflow-hidden flex items-center justify-center flex-shrink-0">
+                        <img id="editImagePreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                        <i id="editImagePlaceholder" class="fa-solid fa-image text-slate-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-slate-300 block">Şəkil Ön Baxışı</span>
+                        <span class="text-[11px] text-slate-500">URL daxil etdikdə şəkil burada görünəcək</span>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800/80">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold rounded-xl transition">
+                        Ləğv Et
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Yadda Saxla
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Product Editing Modal -->
+    <script>
+        function openEditModal(id, name, category, price, stock, imgURL) {
+            const modal = document.getElementById('editProductModal');
+            const form = document.getElementById('editProductForm');
+            const subtitle = document.getElementById('editModalSubtitle');
+            
+            form.action = '/admin/products/update/' + id;
+            subtitle.innerText = 'ID: #' + id + ' — ' + name;
+            
+            document.getElementById('edit_name').value = name || '';
+            document.getElementById('edit_category').value = category || '';
+            document.getElementById('edit_price').value = price || '';
+            document.getElementById('edit_stock').value = stock || '';
+            document.getElementById('edit_imgURL').value = imgURL || '';
+            
+            updateImagePreview(imgURL);
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editProductModal');
+            modal.classList.add('hidden');
+        }
+
+        function updateImagePreview(url) {
+            const img = document.getElementById('editImagePreview');
+            const placeholder = document.getElementById('editImagePlaceholder');
+            if (url && url.trim() !== '') {
+                img.src = url;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('editProductModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        });
+    </script>
 </body>
 </html>
