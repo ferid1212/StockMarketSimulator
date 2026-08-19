@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Təzə Bazar — Anbar İdarəetməsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark">TB</span>
+      <span class="brand__name">Təzə&nbsp;Bazar</span>
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab is-active" data-tab="store">Mağaza</button>
+      <button class="tab" data-tab="basket">Səbətim <span class="tab__badge" id="basketBadge">0</span></button>
+      <button class="tab" data-tab="favorites">Sevimlilər</button>
+      <button class="tab" data-tab="admin">Admin</button>
+    </nav>
+
+    <button class="user-chip" id="userChip">
+      <span class="user-chip__dot"></span>
+      <span id="userChipLabel">İstifadəçi seç</span>
+    </button>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- ================= STORE ================= -->
+  <section class="view is-active" id="view-store">
+    <div class="store-head">
+      <div>
+        <p class="eyebrow">Rəf 01 — Anbar</p>
+        <h1>Bugünkü mal-qara siyahısı</h1>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Məhsul axtar…">
+        <button id="searchBtn">Axtar</button>
+        <button id="clearSearchBtn" class="ghost-btn" hidden>Təmizlə</button>
+      </div>
+    </div>
+
+    <div class="chip-row" id="categoryChips"></div>
+
+    <div class="grid" id="productGrid"></div>
+    <p class="empty-state" id="storeEmpty" hidden>Heç nə tapılmadı. Başqa kateqoriya və ya axtarış sınayın.</p>
+  </section>
+
+  <!-- ================= BASKET ================= -->
+  <section class="view" id="view-basket">
+    <p class="eyebrow">Rəf 02 — Səbət</p>
+    <h1>Səbətindəki məhsullar</h1>
+
+    <div class="basket-layout">
+      <div class="basket-list" id="basketList"></div>
+
+      <aside class="basket-summary">
+        <h3>Yekun</h3>
+        <div class="summary-row">
+          <span>Məhsul sayı</span>
+          <span id="summaryCount">0</span>
+        </div>
+        <div class="summary-row summary-row--total">
+          <span>Cəmi</span>
+          <span id="summaryTotal">0.00 ₼</span>
+        </div>
+        <div class="summary-row summary-row--balance">
+          <span>Balansın</span>
+          <span id="summaryBalance">—</span>
+        </div>
+        <button class="primary-btn full" id="payBtn">Ödə və rəfi boşalt</button>
+        <p class="hint" id="basketHint"></p>
+      </aside>
+    </div>
+    <p class="empty-state" id="basketEmpty" hidden>Səbət boşdur. Mağazadan məhsul əlavə et.</p>
+  </section>
+
+  <!-- ================= FAVORITES ================= -->
+  <section class="view" id="view-favorites">
+    <p class="eyebrow">Rəf 03 — Seçilmişlər</p>
+    <h1>Sevimli məhsulların</h1>
+    <div class="grid" id="favoritesGrid"></div>
+    <p class="empty-state" id="favoritesEmpty" hidden>Hələ heç nəyi ürəkləməmisən.</p>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section class="view" id="view-admin">
+    <p class="eyebrow">Anbar dəftəri</p>
+    <h1>Məhsulları idarə et</h1>
+
+    <form class="admin-form" id="productForm">
+      <input type="hidden" id="productId">
+      <div class="field">
+        <label for="f_name">Ad</label>
+        <input type="text" id="f_name" required>
+      </div>
+      <div class="field">
+        <label for="f_price">Qiymət (₼)</label>
+        <input type="number" id="f_price" step="0.01" min="0" required>
+      </div>
+      <div class="field">
+        <label for="f_category">Kateqoriya</label>
+        <select id="f_category" required></select>
+      </div>
+      <div class="field">
+        <label for="f_stock">Stok</label>
+        <input type="number" id="f_stock" min="0" required>
+      </div>
+      <div class="field field--wide">
+        <label for="f_img">Şəkil linki (URL)</label>
+        <input type="text" id="f_img" placeholder="https://…">
+      </div>
+      <div class="field field--actions">
+        <button type="submit" class="primary-btn" id="formSubmitBtn">Məhsul əlavə et</button>
+        <button type="button" class="ghost-btn" id="formResetBtn" hidden>Ləğv et</button>
+      </div>
+    </form>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Şəkil</th><th>Ad</th><th>Kateqoriya</th><th>Qiymət</th><th>Stok</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<!-- ================= USER MODAL ================= -->
+<div class="modal-backdrop" id="userModal">
+  <div class="modal">
+    <h2>Kimsən?</h2>
+    <p class="modal__sub">Səbət və sevimlilər üçün istifadəçi seç, ya da yenisini yarat.</p>
+
+    <div class="modal__section">
+      <label for="userSelect">Mövcud istifadəçilər</label>
+      <select id="userSelect"></select>
+      <button class="primary-btn full" id="useSelectedUserBtn">Bunu seç</button>
+    </div>
+
+    <div class="modal__divider">və ya</div>
+
+    <form class="modal__section" id="newUserForm">
+      <label>Yeni istifadəçi yarat</label>
+      <div class="modal__grid">
+        <input type="text" id="nu_name" placeholder="Ad" required>
+        <input type="text" id="nu_surname" placeholder="Soyad" required>
+        <input type="number" id="nu_age" placeholder="Yaş (18+)" min="18" required>
+        <input type="text" id="nu_phone" placeholder="Telefon" required>
+        <input type="email" id="nu_email" placeholder="E-poçt" required>
+        <input type="number" id="nu_balance" placeholder="Balans (₼)" min="0" step="0.01" required>
+      </div>
+      <button type="submit" class="primary-btn full">Yarat və seç</button>
+    </form>
+    <p class="modal__error" id="modalError"></p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstifadəçi Paneli | Stock System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #090d16);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .tab-active {
+            border-bottom: 3px solid #6366f1;
+            color: #818cf8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="glass-card sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <i class="fa-solid fa-boxes-stacked text-xl"></i>
+            </div>
+            <span class="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">Stock System</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <span sec:authorize="hasAuthority('ROLE_ADMIN')" class="px-3.5 py-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-semibold hover:bg-purple-500/30 transition">
+                <a th:href="@{/admin}"><i class="fa-solid fa-user-shield mr-1.5"></i> Admin Paneli</a>
+            </span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl border border-slate-700 transition">
+                    Çıxış <i class="fa-solid fa-arrow-right-from-bracket ml-1.5"></i>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+
+        <!-- Alerts Section -->
+        <div th:if="${param.basketAdded}" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+            <span>Məhsul səbətə əlavə olundu!</span>
+        </div>
+        <div th:if="${param.basketRemoved}" class="p-4 rounded-xl bg-slate-700/60 border border-slate-600 text-slate-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-trash-can text-lg"></i>
+            <span>Məhsul səbətdən silindi.</span>
+        </div>
+        <div th:if="${param.paid}" class="p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm flex items-center gap-3 shadow-lg">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <span><strong>Ödəniş uğurla həyata keçirildi!</strong> Məhsul stokları yeniləndi və səbət təmizləndi.</span>
+        </div>
+        <div th:if="${param.favUpdated}" class="p-4 rounded-xl bg-pink-500/10 border border-pink-500/30 text-pink-400 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-heart text-lg"></i>
+            <span>Sevimlilər siyahısı yeniləndi!</span>
+        </div>
+        <div th:if="${param.balanceAdded}" class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-wallet text-lg"></i>
+            <span>Balansınıza +100.00 ₼ əlavə edildi!</span>
+        </div>
+        <div th:if="${param.error}" class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation text-lg"></i>
+            <span th:text="${param.error}">Xəta baş verdi!</span>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="glass-card rounded-2xl p-6 shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        <span th:text="${user != null && user.name != null ? user.name.substring(0,1) : 'U'}">U</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">
+                            Xoş gəldiniz, <span th:text="${user != null ? user.name + ' ' + user.surname : 'İstifadəçi'}">İstifadəçi</span>! 👋
+                        </h2>
+                        <p class="text-slate-400 text-sm" th:text="${user != null ? user.email : ''}">user@gmail.com</p>
+                    </div>
+                </div>
+
+                <!-- Balance & Top up Action -->
+                <div class="flex items-center gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Balansınız</span>
+                        <p class="text-2xl font-bold text-emerald-400" th:text="${user != null && user.balance != null ? #numbers.formatDecimal(user.balance, 1, 2) + ' ₼' : '0.00 ₼'}">0.00 ₼</p>
+                    </div>
+                    <form th:action="@{/user/add-balance}" method="post">
+                        <input type="hidden" name="amount" value="100.0" />
+                        <button type="submit" class="px-3.5 py-2 bg-indigo-600/80 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-plus-circle"></i> +100 ₼ Artır
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 text-sm font-medium gap-8">
+            <button onclick="switchTab('products')" id="tab-btn-products" class="tab-active py-3 flex items-center gap-2 transition">
+                <i class="fa-solid fa-boxes-packing"></i> Məhsullar Kataloqu
+            </button>
+            <button onclick="switchTab('basket')" id="tab-btn-basket" class="py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+                <i class="fa-solid fa-cart-shopping"></i> Səbətim 
+                <span class="px-2 py-0.5 text-xs bg-indigo-600 text-white rounded-full font-bold" th:text="${#lists.size(basketItems)}">0</span>
+            </button>
+            <button onclick="switchTab('favorites')" id="tab-btn-favorites" class="py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+                <i class="fa-solid fa-heart text-pink-400"></i> Sevimlilər 
+                <span class="px-2 py-0.5 text-xs bg-pink-600/40 text-pink-300 rounded-full font-bold" th:text="${#lists.size(favorites)}">0</span>
+            </button>
+        </div>
+
+        <!-- Tab 1: Products Catalog Grid -->
+        <div id="tab-content-products" class="space-y-6">
+            
+            <!-- Search & Category Filter Bar -->
+            <form th:action="@{/dashboard}" method="get" class="glass-card p-4 rounded-xl flex flex-col md:flex-row items-center gap-3">
+                <!-- Search Input -->
+                <div class="relative flex-1 w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" name="search" th:value="${searchQuery}" placeholder="Məhsul adı ilə axtar..." 
+                           class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700/80 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <!-- Category Dropdown Filter -->
+                <div class="w-full md:w-56">
+                    <select name="category" class="w-full px-3 py-2.5 bg-slate-900/80 border border-slate-700/80 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <option value="">Bütün Kateqoriyalar</option>
+                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${cat.name() == selectedCategory}">ELECTRONICS</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button type="submit" class="flex-1 md:flex-none px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-lg transition shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-filter"></i> Axtar
+                    </button>
+
+                    <a th:href="@{/dashboard}" th:if="${(searchQuery != null && !#strings.isEmpty(searchQuery)) || (selectedCategory != null && !#strings.isEmpty(selectedCategory))}"
+                       class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+                    </a>
+                </div>
+            </form>
+
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-white">Mövcud Məhsullar</h3>
+                <span class="text-xs text-slate-400" th:text="${#lists.size(products)} + ' Məhsul var'">0 Məhsul</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div th:each="product : ${products}" class="glass-card rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/40 transition duration-200 group">
+                    <div>
+                        <div class="w-full h-40 bg-slate-900/80 rounded-xl overflow-hidden mb-4 flex items-center justify-center border border-slate-800 relative">
+                            <img th:if="${product.imgURL != null && !#strings.isEmpty(product.imgURL)}" th:src="${product.imgURL}" alt="Product" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div th:if="${product.imgURL == null || #strings.isEmpty(product.imgURL)}" class="text-slate-600 flex flex-col items-center">
+                                <i class="fa-solid fa-box text-4xl mb-2"></i>
+                                <span class="text-xs">Şəkil mövcud deyil</span>
+                            </div>
+
+                            <form th:action="@{'/favorites/toggle/' + ${product.id}}" method="post" class="absolute top-3 right-3">
+                                <button type="submit" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-slate-800 text-pink-400 flex items-center justify-center shadow transition border border-slate-700/60">
+                                    <i class="fa-solid fa-heart"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-md text-xs font-semibold" th:text="${product.category}">ELECTRONICS</span>
+                            <span th:if="${product.stock > 0}" class="text-xs text-emerald-400 font-medium"><i class="fa-solid fa-check mr-1"></i> Stok: <span th:text="${product.stock}">10</span></span>
+                            <span th:if="${product.stock <= 0}" class="text-xs text-red-400 font-medium"><i class="fa-solid fa-xmark mr-1"></i> Stok Bitib</span>
+                        </div>
+
+                        <h4 class="text-base font-bold text-white mb-1" th:text="${product.name}">Laptop Pro</h4>
+                        <p class="text-xl font-extrabold text-emerald-400 mb-4" th:text="${#numbers.formatDecimal(product.price, 1, 2) + ' ₼'}">999.00 ₼</p>
+                    </div>
+
+                    <form th:action="@{/basket/add}" method="post" class="space-y-3 pt-3 border-t border-slate-800">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-slate-400">Sayı:</label>
+                            <input type="number" name="quantity" value="1" min="1" th:max="${product.stock}" 
+                                   class="w-16 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-center text-sm font-semibold text-white focus:outline-none focus:border-indigo-500">
+                            
+                            <button type="submit" th:disabled="${product.stock <= 0}"
+                                    class="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white text-xs font-bold rounded-lg transition shadow flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-cart-plus"></i> Səbətə Əlavə Et
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div th:if="${#lists.isEmpty(products)}" class="col-span-3 text-center py-12 glass-card rounded-2xl text-slate-500">
+                    <i class="fa-solid fa-magnifying-glass text-4xl mb-3 text-slate-600"></i>
+                    <p class="text-base">Axtarışa uyğun heç bir məhsul tapılmadı.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Basket & Checkout View -->
+        <div id="tab-content-basket" class="hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-indigo-400"></i> Səbətimdəki Məhsullar
+                </h3>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 shadow-xl space-y-6">
+                <div class="overflow-x-auto rounded-xl border border-slate-800">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="px-4 py-3">Məhsul</th>
+                                <th class="px-4 py-3">Qiymət</th>
+                                <th class="px-4 py-3">Sayı</th>
+                                <th class="px-4 py-3">Cəmi</th>
+                                <th class="px-4 py-3 text-right">Sil</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <tr th:each="item : ${basketItems}" class="hover:bg-slate-800/40 transition">
+                                <td class="px-4 py-3 font-semibold text-white" th:text="${item.product != null ? item.product.name : 'Unknown'}">Məhsul Adı</td>
+                                <td class="px-4 py-3 text-slate-300" th:text="${item.product != null ? #numbers.formatDecimal(item.product.price, 1, 2) + ' ₼' : '0 ₼'}">10 ₼</td>
+                                <td class="px-4 py-3 font-mono font-bold text-indigo-300" th:text="${item.quantity}">1</td>
+                                <td class="px-4 py-3 font-extrabold text-emerald-400" th:text="${item.product != null ? #numbers.formatDecimal(item.product.price * item.quantity, 1, 2) + ' ₼' : '0 ₼'}">10 ₼</td>
+                                <td class="px-4 py-3 text-right">
+                                    <form th:action="@{'/basket/remove/' + ${item.product.id}}" method="post" class="inline">
+                                        <button type="submit" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs transition">
+                                            <i class="fa-solid fa-trash-can mr-1"></i> Sil
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(basketItems)}">
+                                <td colspan="5" class="text-center py-8 text-slate-500">Səbətiniz boşdur.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(basketItems)}" class="flex flex-col md:flex-row items-center justify-between gap-4 p-5 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-xs text-slate-400 uppercase tracking-wider block font-semibold">Ödəniləcək Cəmi Məbləğ</span>
+                        <p class="text-3xl font-extrabold text-emerald-400" th:text="${#numbers.formatDecimal(basketTotal, 1, 2) + ' ₼'}">0.00 ₼</p>
+                    </div>
+
+                    <form th:action="@{/basket/payment}" method="post">
+                        <button type="submit" class="px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 transition transform hover:-translate-y-0.5">
+                            <i class="fa-solid fa-credit-card mr-2"></i> Ödəniş Et (Checkout)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Favorites View -->
+        <div id="tab-content-favorites" class="hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-heart text-pink-400"></i> Seçilmiş Sevimlilərim
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div th:each="fav : ${favorites}" class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="px-2.5 py-0.5 bg-pink-500/10 text-pink-300 border border-pink-500/20 rounded-md text-xs font-semibold block w-fit mb-2" th:text="${fav.category}">CATEGORY</span>
+                        <h4 class="text-base font-bold text-white mb-1" th:text="${fav.name}">Məhsul</h4>
+                        <p class="text-xl font-extrabold text-emerald-400 mb-4" th:text="${#numbers.formatDecimal(fav.price, 1, 2) + ' ₼'}">0.00 ₼</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-3 border-t border-slate-800">
+                        <form th:action="@{/basket/add}" method="post" class="flex-1">
+                            <input type="hidden" name="productId" th:value="${fav.id}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Səbətə At
+                            </button>
+                        </form>
+                        
+                        <form th:action="@{'/favorites/delete/' + ${fav.id}}" method="post">
+                            <button type="submit" class="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold rounded-lg transition">
+                                <i class="fa-solid fa-heart-crack"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(favorites)}" class="col-span-3 text-center py-12 glass-card rounded-2xl text-slate-500">
+                    <i class="fa-regular fa-heart text-4xl mb-3"></i>
+                    <p class="text-base">Sevimlilər siyahınız boşdur.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Tab Switcher Script -->
+    <script>
+        function switchTab(tabName) {
+            const tabs = ['products', 'basket', 'favorites'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-btn-' + t);
+                const content = document.getElementById('tab-content-' + t);
+                if (t === tabName) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('text-slate-400');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('text-slate-400');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

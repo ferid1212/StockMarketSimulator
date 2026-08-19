@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daxil Ol | Stock System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #090d16);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 text-slate-100">
+    <div class="w-full max-w-md">
+        <!-- Logo & Branding -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 mb-4 shadow-lg shadow-indigo-500/10">
+                <i class="fa-solid fa-boxes-stacked text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">Stock System</h1>
+            <p class="text-slate-400 text-sm mt-1">Sistemə daxil olmaq üçün məlumatlarınızı daxil edin</p>
+        </div>
+
+        <!-- Glass Login Box -->
+        <div class="glass-card rounded-2xl p-8 shadow-2xl shadow-black/50">
+            
+            <!-- Alert Messages -->
+            <div th:if="${param.error}" class="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3">
+                <i class="fa-solid fa-circle-exclamation text-lg"></i>
+                <span>Email və ya şifrə yanlışdır! Zəhmət olmasa yenidən cəhd edin.</span>
+            </div>
+            <div th:if="${param.logout}" class="mb-5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
+                <i class="fa-solid fa-circle-check text-lg"></i>
+                <span>Uğurla sistemdən çıxış etdiniz.</span>
+            </div>
+            <div th:if="${param.registered}" class="mb-5 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-sm flex items-center gap-3">
+                <i class="fa-solid fa-circle-check text-lg"></i>
+                <span>Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.</span>
+            </div>
+
+            <form th:action="@{/login}" method="post" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Gmail / Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                            <i class="fa-envelope fa-regular"></i>
+                        </span>
+                        <input type="email" name="email" required placeholder="admin@gmail.com"
+                               class="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-slate-700/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-white placeholder-slate-500 text-sm transition-all duration-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Şifrə / Kod</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                            <i class="fa-lock fa-solid"></i>
+                        </span>
+                        <input type="password" name="password" required placeholder="••••••••"
+                               class="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-slate-700/60 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-white placeholder-slate-500 text-sm transition-all duration-200">
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0">
+                    Daxil Ol <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-slate-800 text-center">
+                <p class="text-sm text-slate-400">
+                    Hesabınız yoxdur? 
+                    <a th:href="@{/register}" class="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">Hesab Yarat</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center text-xs text-slate-500">
+            <p>Admin Gmail: <span class="text-indigo-400 font-mono">admin@gmail.com</span> | Kod: <span class="text-indigo-400 font-mono">admin123</span></p>
+        </div>
+    </div>
+</body>
+</html>
